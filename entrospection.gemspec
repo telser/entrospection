@@ -15,6 +15,7 @@ Gem::Specification.new do |s|
   s.executables   << 'entrocine'
 
   s.add_development_dependency 'bundler'
+  s.add_development_dependency 'rake'
 
   s.add_runtime_dependency 'chunky_png'
 end
