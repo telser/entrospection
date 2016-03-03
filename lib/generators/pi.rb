@@ -36,8 +36,8 @@ class PiGenerator < Generator
 
     # Perform the first, 'left', sum of the bbp formula
     while k <= n
-      r = (8.0 * k) + j
-      left = (left + (((16**n).modulo(r)) / r)).modulo(1.0)
+      r = (8 * k) + j
+      left = (left + (((16**(n-k)) % r) / r.to_f))
       k +=1
     end
 
@@ -45,32 +45,39 @@ class PiGenerator < Generator
     k = n+1
     stable = false
     while !stable
-      tempRight = right + ((16 ** (n - k)) / ((8 * k) +j))
+      tempRight = (right + ((16 ** (n - k)) / ((8.0 * k) +j)))
       if right == tempRight
         stable = true
+      else
+        right = tempRight
       end
-      right = tempRight
       k += 1
     end
 
     left + right
-
   end
 
-  # Overflows ruby floating point at, and above, 257
+  # Perform the summation to calculate the n-th digit of pi
+  def sumPart(n)
+    a = 4 * S(1,n)
+    b = 2 * S(4,n)
+    c = S(5,n)
+    d = S(6,n)
+    (a - b - c - d) % 1
+  end
+
   def bbp(n)
     n -=1
-    # Perform the summation to calculate the n-th digit of pi
-    x = ( 4 * S(1,n) - 2 * S(4,n) - S(5,n) - S(6,n)).modulo(1.0)
-    # This will give back 7 hex digits of pi, even though we only care about the first
-    z = (x * 16**7)
-    "%07x" % z
+    x = sumPart(n)
+    y = (x * (16**14))
+    "%x" % y
   end
 
   def next_chunk
     @i +=1
-    x = bbp(@i).to_s.chars[0]
-    [ x ].pack('A')
+    x = bbp(@i).to_s[0]
+    y = "%b" % x.to_i(16)
+    [ y ].pack('p')
   end
 
 end
